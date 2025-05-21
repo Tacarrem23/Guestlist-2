@@ -52,3 +52,49 @@ function App() {
 }
 
 export default App;
+
+import React, { useState } from 'react';
+import { useGuests } from './hooks/useGuests';
+import { useGuestDetails } from './hooks/useGuestDetails';
+
+function App() {
+  const [selectedGuestId, setSelectedGuestId] = useState(null);
+  const { guests, loading: guestsLoading } = useGuests();
+  const { guest, loading: detailsLoading } = useGuestDetails(selectedGuestId);
+
+  const handleSelect = (id) => setSelectedGuestId(id);
+  const handleBack = () => setSelectedGuestId(null);
+
+  if (guestsLoading) return <p>Loading guests...</p>;
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Guest List</h1>
+      {selectedGuestId ? (
+        detailsLoading ? (
+          <p>Loading guest details...</p>
+        ) : (
+          <div>
+            <h2>{guest.name}</h2>
+            <p>Email: {guest.email}</p>
+            <p>Phone: {guest.phone}</p>
+            <p>Job: {guest.job}</p>
+            <p>Bio: {guest.bio}</p>
+            <button onClick={handleBack}>Back</button>
+          </div>
+        )
+      ) : (
+        <ul>
+          {guests.map(guest => (
+            <li key={guest.id} onClick={() => handleSelect(guest.id)} style={{ cursor: 'pointer' }}>
+              <strong>{guest.name}</strong> - {guest.email}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default App;
+
